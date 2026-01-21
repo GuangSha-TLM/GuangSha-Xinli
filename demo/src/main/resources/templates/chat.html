@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>心理AI - 聊天</title>
+    <link rel="stylesheet" th:href="@{/chat.css}" href="/chat.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="chat-container">
+    <header class="chat-header">
+        <h1>哈尔滨广傻学院心理AI助手</h1>
+        <p class="subtitle">制造 BY 舔了么 Team</p>
+    </header>
+    <main class="chat-main" id="chat-main">
+        <!-- 聊天内容 -->
+    </main>
+    <form class="chat-input-bar" id="chat-form" autocomplete="off">
+        <input type="text" id="chat-input" placeholder="请输入你的心理困惑..." maxlength="200" required />
+        <button type="submit">发送</button>
+    </form>
+</div>
+<script th:src="@{/chat.js}" src="/chat.js"></script>
+</body>
+</html>
