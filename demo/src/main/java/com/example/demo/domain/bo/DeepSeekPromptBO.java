@@ -1,9 +1,11 @@
 package com.example.demo.domain.bo;
 
+
+import java.util.List;
 import lombok.Data;
+import com.example.demo.domain.bo.DeepSeekMessageBO;
 
 @Data
 public class DeepSeekPromptBO {
-    private String prompt;
-    private String studentName;
+    private java.util.List<DeepSeekMessageBO> messages;
 }

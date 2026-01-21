@@ -11,6 +11,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.demo.constants.DeepSeekPrompts;
+import com.example.demo.domain.bo.DeepSeekMessageBO;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class DeepSeekService {
@@ -22,23 +25,26 @@ public class DeepSeekService {
     private WebClient deepSeekWebClient;
 
 
-            public Flux<String> streamChatWithSystemPrompt(String prompt, String studentName) {
-            String sysPrompt = DeepSeekPrompts.SYSTEM_PROMPT.replace("{studentName}", studentName == null ? "the student" : studentName);
-            Object[] messages = new Object[]{
-                Map.of("role", "system", "content", sysPrompt),
-                Map.of("role", "user", "content", prompt)
-            };
-            Map<String, Object> requestBody = Map.of(
-                "model", "deepseek-chat",
-                "messages", messages,
-                "stream", true
-            );
-            return deepSeekWebClient.post()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(requestBody))
-                .accept(MediaType.TEXT_EVENT_STREAM, MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToFlux(String.class)
-                .doOnNext(data -> log.info("DeepSeek返回: {}", data));
-            }
+                public Flux<String> streamChatWithHistory(List<DeepSeekMessageBO> history) {
+                    String sysPrompt = DeepSeekPrompts.SYSTEM_PROMPT.replace("{studentName}", "the student");
+                    List<Object> messages = new ArrayList<>();
+                    messages.add(java.util.Map.of("role", "system", "content", sysPrompt));
+                    if (history != null) {
+                        for (DeepSeekMessageBO msg : history) {
+                            messages.add(java.util.Map.of("role", msg.getRole(), "content", msg.getContent()));
+                        }
+                    }
+                    Map<String, Object> requestBody = java.util.Map.of(
+                            "model", "deepseek-chat",
+                            "messages", messages,
+                            "stream", true
+                    );
+                    return deepSeekWebClient.post()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(BodyInserters.fromValue(requestBody))
+                            .accept(MediaType.TEXT_EVENT_STREAM, MediaType.APPLICATION_JSON)
+                            .retrieve()
+                            .bodyToFlux(String.class)
+                            .doOnNext(data -> log.info("DeepSeek返回: {}", data));
+                }
 }

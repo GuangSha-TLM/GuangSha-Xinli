@@ -15,6 +15,6 @@ public class DeepSeekController {
 
     @PostMapping(value = "/chat", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatStream(@RequestBody DeepSeekPromptBO promptBO) {
-        return deepSeekService.streamChatWithSystemPrompt(promptBO.getPrompt(), promptBO.getStudentName());
+        return deepSeekService.streamChatWithHistory(promptBO.getMessages());
     }
 }
