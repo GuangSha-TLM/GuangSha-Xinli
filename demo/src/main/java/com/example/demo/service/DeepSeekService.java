@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,17 +29,22 @@ public class DeepSeekService {
                 public Flux<String> streamChatWithHistory(List<DeepSeekMessageBO> history) {
                     String sysPrompt = DeepSeekPrompts.SYSTEM_PROMPT.replace("{studentName}", "the student");
                     List<Object> messages = new ArrayList<>();
-                    messages.add(java.util.Map.of("role", "system", "content", sysPrompt));
+                    Map<String, Object> systemMessage = new HashMap<>();
+                    systemMessage.put("role", "system");
+                    systemMessage.put("content", sysPrompt);
+                    messages.add(systemMessage);
                     if (history != null) {
                         for (DeepSeekMessageBO msg : history) {
-                            messages.add(java.util.Map.of("role", msg.getRole(), "content", msg.getContent()));
+                            Map<String, Object> historyMessage = new HashMap<>();
+                            historyMessage.put("role", msg.getRole());
+                            historyMessage.put("content", msg.getContent());
+                            messages.add(historyMessage);
                         }
                     }
-                    Map<String, Object> requestBody = java.util.Map.of(
-                            "model", "deepseek-chat",
-                            "messages", messages,
-                            "stream", true
-                    );
+                    Map<String, Object> requestBody = new HashMap<>();
+                    requestBody.put("model", "deepseek-chat");
+                    requestBody.put("messages", messages);
+                    requestBody.put("stream", true);
                     return deepSeekWebClient.post()
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(BodyInserters.fromValue(requestBody))
