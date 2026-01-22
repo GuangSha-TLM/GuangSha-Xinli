@@ -2,104 +2,110 @@ const chatMain = document.getElementById('chat-main');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 
-let messages = [];
-
-function addBubble(role, content) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'bubble-row ' + (role === 'user' ? 'row-user' : 'row-ai');
-    const avatar = document.createElement('img');
-    avatar.className = 'avatar';
-    avatar.src = role === 'user' ? '/image/user.png' : '/image/623.wegp';
-    avatar.alt = role === 'user' ? '用户' : 'AI';
+function appendMessage(role, text, streaming = false) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${role}`;
     const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble ' + (role === 'user' ? 'bubble-user' : 'bubble-ai');
-    bubble.innerHTML = content;
-    if (role === 'user') {
-        wrapper.appendChild(bubble);
-        wrapper.appendChild(avatar);
-    } else {
-        wrapper.appendChild(avatar);
-        wrapper.appendChild(bubble);
-    }
-    chatMain.appendChild(wrapper);
+    bubble.className = `bubble ${role}`;
+    bubble.textContent = text;
+    msgDiv.appendChild(bubble);
+    chatMain.appendChild(msgDiv);
     chatMain.scrollTop = chatMain.scrollHeight;
+    return bubble;
 }
 
-function renderHistory() {
-    chatMain.innerHTML = '';
-    messages.forEach(msg => addBubble(msg.role, msg.content));
-}
-
-
-
-
-chatForm.addEventListener('submit', async function(e) {
+chatForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    const userMsg = chatInput.value.trim();
-    if (!userMsg) return;
-    messages.push({ role: 'user', content: userMsg });
-    renderHistory();
+    const userText = chatInput.value.trim();
+    if (!userText) return;
     chatInput.value = '';
-    chatInput.focus();
-    await fetchAI();
+    const userBubble = appendMessage('user', userText);
+    userBubble.classList.add('sending');
+    sendToAI(userText);
 });
 
-
-async function fetchAI() {
-    let aiContent = '';
-    // 先渲染AI思考气泡
-    const aiMsg = { role: 'assistant', content: '<span class="typing">AI正在思考...</span>' };
-    messages.push(aiMsg);
-    renderHistory();
-    const aiIndex = messages.length - 1;
-    try {
-        const response = await fetch('/deepseek/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ messages: messages.slice(0, aiIndex) })
-        });
-        if (!response.body || !response.ok) throw new Error('网络错误');
+function sendToAI(text) {
+    const aiBubble = appendMessage('ai', '', true);
+    aiBubble.textContent = '...';
+    const messages = Array.from(document.querySelectorAll('.message')).map(msg => {
+        const role = msg.classList.contains('user') ? 'user' : 'assistant';
+        const content = msg.querySelector('.bubble').textContent;
+        return { role, content };
+    });
+    messages.push({ role: 'user', content: text });
+    const payload = { messages };
+    let aiText = '';
+    fetch('/deepseek/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).then(response => {
+        if (!response.body) {
+            aiBubble.textContent = 'AI助手暂时无法响应，请稍后再试。';
+            return;
+        }
         const reader = response.body.getReader();
         const decoder = new TextDecoder('utf-8');
-        let done = false;
-        while (!done) {
-            const { value, done: doneReading } = await reader.read();
-            done = doneReading;
-            if (value) {
-                const chunk = decoder.decode(value);
-                chunk.split('\n').forEach(line => {
-                    if (line.startsWith('data:')) {
-                        const data = line.replace('data:', '').trim();
-                        if (data && data !== '[DONE]') {
-                            try {
-                                const json = JSON.parse(data);
-                                // 只拼接choices[0].delta.content
-                                const content = json.choices && json.choices[0] && json.choices[0].delta && json.choices[0].delta.content;
-                                if (content) {
-                                    aiContent += content;
-                                    messages[aiIndex].content = aiContent;
-                                    renderHistory();
-                                }
-                            } catch (e) {
-                                // 非JSON直接忽略
-                            }
+        let buffer = '';
+        function processBuffer() {
+            // 处理所有完整的 data: 行
+            let lines = buffer.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                if (line.startsWith('data:')) {
+                    let data = line.slice(5).trim();
+                    if (data === '[DONE]') continue;
+                    try {
+                        const json = JSON.parse(data);
+                        const delta = json.choices?.[0]?.delta;
+                        if (delta && 'content' in delta) {
+                            aiText += delta.content;
+                            aiBubble.textContent = aiText;
+                            chatMain.scrollTop = chatMain.scrollHeight;
                         }
+                    } catch (e) {
+                        // 忽略解析失败的行
                     }
-                });
+                }
             }
         }
-    } catch (e) {
-        messages[aiIndex].content = '<span style="color:red">AI回复失败，请重试</span>';
-        renderHistory();
-    }
+        function read() {
+            reader.read().then(({ done, value }) => {
+                if (done) {
+                    processBuffer();
+                    if (!aiText) aiBubble.textContent = 'AI助手暂时无法响应，请稍后再试。';
+                    return;
+                }
+                buffer += decoder.decode(value);
+                // 只处理完整的 data: 行，剩下的留到下次
+                let lastNewline = buffer.lastIndexOf('\n');
+                if (lastNewline !== -1) {
+                    let processPart = buffer.slice(0, lastNewline);
+                    buffer = buffer.slice(lastNewline + 1);
+                    processPart.split('\n').forEach(line => {
+                        if (line.startsWith('data:')) {
+                            let data = line.slice(5).trim();
+                            if (data === '[DONE]') return;
+                            try {
+                                const json = JSON.parse(data);
+                                const delta = json.choices?.[0]?.delta;
+                                if (delta && 'content' in delta) {
+                                    aiText += delta.content;
+                                    aiBubble.textContent = aiText;
+                                    chatMain.scrollTop = chatMain.scrollHeight;
+                                }
+                            } catch (e) {
+                                // 忽略解析失败的行
+                            }
+                        }
+                    });
+                }
+                read();
+            });
+        }
+        read();
+    }).catch(() => {
+        aiBubble.textContent = 'AI助手暂时无法响应，请稍后再试。';
+    });
 }
 
-// 兼容 EventSource POST（需引入 polyfill）
-(function() {
-    if (!window.EventSourcePolyfill) {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/event-source-polyfill@1.0.32/eventsource.min.js';
-        script.onload = () => { window.EventSourcePolyfill = window.EventSourcePolyfill || window.EventSource; };
-        document.head.appendChild(script);
-    }
-})();

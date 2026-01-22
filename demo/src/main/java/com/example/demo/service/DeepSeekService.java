@@ -27,11 +27,16 @@ public class DeepSeekService {
 
                 public Flux<String> streamChatWithHistory(List<DeepSeekMessageBO> history) {
                     String sysPrompt = DeepSeekPrompts.SYSTEM_PROMPT.replace("{studentName}", "the student");
-                    List<Object> messages = new ArrayList<>();
+                    List<Map<String, String>> messages = new ArrayList<>();
                     messages.add(java.util.Map.of("role", "system", "content", sysPrompt));
                     if (history != null) {
                         for (DeepSeekMessageBO msg : history) {
-                            messages.add(java.util.Map.of("role", msg.getRole(), "content", msg.getContent()));
+                            String role = msg.getRole();
+                            // 只允许 user/assistant
+                            if (!"user".equals(role) && !"assistant".equals(role)) {
+                                role = "user";
+                            }
+                            messages.add(java.util.Map.of("role", role, "content", msg.getContent()));
                         }
                     }
                     Map<String, Object> requestBody = java.util.Map.of(
@@ -39,6 +44,7 @@ public class DeepSeekService {
                             "messages", messages,
                             "stream", true
                     );
+                    log.info("DeepSeek请求体: {}", requestBody);
                     return deepSeekWebClient.post()
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(BodyInserters.fromValue(requestBody))
