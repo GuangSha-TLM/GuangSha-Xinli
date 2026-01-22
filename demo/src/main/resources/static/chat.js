@@ -1,6 +1,19 @@
+// 检查登录状态，未登录则跳转到登录页
+fetch('/auth/me').then(res => res.json()).then(data => {
+    if (!data || data.code !== 0) {
+        window.location.href = '/auth.html';
+    }
+});
+
 const chatMain = document.getElementById('chat-main');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
+
+function getSidFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('sid');
+}
+const transactionId = getSidFromUrl();
 
 function appendMessage(role, text, streaming = false) {
     const msgDiv = document.createElement('div');
@@ -33,7 +46,7 @@ function sendToAI(text) {
         return { role, content };
     });
     messages.push({ role: 'user', content: text });
-    const payload = { messages };
+    const payload = { messages, transactionId };
     let aiText = '';
     fetch('/deepseek/chat', {
         method: 'POST',
@@ -74,6 +87,17 @@ function sendToAI(text) {
                 if (done) {
                     processBuffer();
                     if (!aiText) aiBubble.textContent = 'AI助手暂时无法响应，请稍后再试。';
+                    // 流式传输结束后，保存聊天记录
+                    const saveMessages = Array.from(document.querySelectorAll('.message')).map(msg => {
+                        const role = msg.classList.contains('user') ? 'user' : 'assistant';
+                        const content = msg.querySelector('.bubble').textContent;
+                        return { role, content };
+                    });
+                    fetch('/deepseek/saveChatHistory', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ messages: saveMessages, transactionId })
+                    });
                     return;
                 }
                 buffer += decoder.decode(value);
