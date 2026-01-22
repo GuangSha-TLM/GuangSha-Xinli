@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>我的</title>
+    <link rel="stylesheet" href="/chat.css">
+    <style>
+        .main-content {
+            min-height: 70vh;
+            padding: 32px 16px 80px 16px;
+            text-align: center;
+        }
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #e0eafc;
+            display: inline-block;
+            margin: 24px 0 12px 0;
+            font-size: 2.5rem;
+            color: #4f8cff;
+            line-height: 80px;
+            font-weight: bold;
+        }
+        .user-info {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 18px;
+        }
+        .logout-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 28px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 18px;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+<div class="main-content">
+    <div class="user-avatar" id="user-avatar">U</div>
+    <div class="user-info" id="user-info">加载中...</div>
+    <button class="logout-btn" onclick="logout()">退出登录</button>
+</div>
+<div class="nav-bar">
+    <a class="nav-item" href="/index">首页</a>
+    <a class="nav-item" href="#" style="pointer-events:none;opacity:0.5;">我的分析</a>
+    <a class="nav-item active" href="/me">我的</a>
+</div>
+<script>
+function getMe() {
+    fetch('/auth/me').then(r => r.json()).then(d => {
+        if(d.code!==0){
+            window.location.href = '/auth';
+            return;
+        }
+        var user = d.data;
+        document.getElementById('user-info').innerText = '用户名：' + user.username;
+        document.getElementById('user-avatar').innerText = user.username ? user.username[0].toUpperCase() : 'U';
+    });
+}
+function logout() {
+    fetch('/auth/logout').then(r => r.json()).then(d => {
+        window.location.href = '/auth';
+    });
+}
+getMe();
+</script>
+</body>
+</html>
