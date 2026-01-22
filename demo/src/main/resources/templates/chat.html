@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>心理AI - 聊天</title>
-    <link rel="stylesheet" th:href="@{/chat.css}" href="/chat.css">
+    <link rel="stylesheet" href="/chat.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -22,7 +22,8 @@
         <input type="text" id="chat-input" placeholder="请输入你的心理困惑..." maxlength="200" required />
         <button type="submit">发送</button>
     </form>
+    <div style="text-align:center;color:#888;font-size:0.9rem;padding:8px 0;">AI助手仅供参考，遇到严重心理问题请及时寻求专业帮助</div>
 </div>
-<script th:src="@{/chat.js}" src="/chat.js"></script>
+<script src="/chat.js"></script>
 </body>
 </html>
