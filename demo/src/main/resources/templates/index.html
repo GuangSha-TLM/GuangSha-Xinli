@@ -6,6 +6,33 @@
     <title>首页</title>
     <link rel="stylesheet" href="/chat.css">
     <style>
+                .chat-card {
+                    margin: 32px auto 0 auto;
+                    max-width: 420px;
+                    background: #f7faff;
+                    border-radius: 18px;
+                    box-shadow: 0 2px 12px rgba(79,140,255,0.08);
+                    padding: 28px 20px 20px 20px;
+                    text-align: left;
+                    border: 1.5px solid #e0eafc;
+                    transition: box-shadow 0.2s, border 0.2s;
+                    cursor: pointer;
+                }
+                .chat-card:hover {
+                    box-shadow: 0 4px 24px rgba(79,140,255,0.16);
+                    border: 1.5px solid #4f8cff;
+                }
+                .chat-card-title {
+                    font-size: 1.25rem;
+                    color: #4f8cff;
+                    font-weight: 700;
+                    margin-bottom: 8px;
+                }
+                .chat-card-desc {
+                    color: #333;
+                    font-size: 1.05rem;
+                    margin-bottom: 0;
+                }
         .main-content {
             min-height: 70vh;
             padding: 48px 24px 100px 24px;
@@ -82,6 +109,23 @@
 <div class="main-content">
     <h1>欢迎来到首页</h1>
     <p>这里是心理AI系统的首页。</p>
+    <div class="chat-card" onclick="gotoChat()">
+        <div class="chat-card-title">AI 聊天</div>
+        <div class="chat-card-desc">点击进入与心理AI助手对话，获得智能心理支持。</div>
+    </div>
+<script>
+// 生成唯一id
+function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+function gotoChat() {
+    var id = uuidv4();
+    window.location.href = '/chat?sid=' + id;
+}
+</script>
 </div>
 <div class="nav-bar">
     <a class="nav-item active" href="/index">首页</a>

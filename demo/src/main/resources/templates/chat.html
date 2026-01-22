@@ -1,6 +1,55 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <style>
+        .chat-header-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #4f8cff;
+            color: #fff;
+            padding: 0 0 0 12px;
+            min-height: 40px;
+            height: auto;
+            border-radius: 0;
+            box-sizing: border-box;
+        }
+        .chat-header-bar h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            line-height: 1.2;
+            padding: 10px 0;
+        }
+        .back-btn2 {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: transparent;
+            color: #fff;
+            border: none;
+            font-size: 1.15rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px 10px 6px 2px;
+            border-radius: 16px;
+            transition: background 0.18s, color 0.18s;
+        }
+        .back-btn2:hover {
+            background: rgba(255,255,255,0.12);
+        }
+        .back-btn2 svg {
+            width: 1.3em;
+            height: 1.3em;
+            fill: currentColor;
+        }
+        @media (max-width: 600px) {
+            .chat-header-bar { min-height: 32px; font-size: 1rem; }
+            .chat-header-bar h1 { font-size: 1.1rem; padding: 7px 0; }
+            .back-btn2 { font-size: 1rem; }
+        }
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>心理AI - 聊天</title>
@@ -10,14 +59,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div style="text-align:right;margin:10px 20px 0 0;">
-    <a href="/auth.html">注册/登录</a>
-</div>
 <div class="chat-container">
-    <header class="chat-header">
-        <h1>哈尔滨广傻学院心理AI助手</h1>
+    <header class="chat-header-bar">
+        <a href="/index" class="back-btn2" title="返回首页">
+            <svg viewBox="0 0 20 20"><path d="M12.7 15.3a1 1 0 0 1-1.4 0l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 1 1 1.4 1.4L8.42 9H17a1 1 0 1 1 0 2H8.42l4.3 4.3a1 1 0 0 1 0 1.4z"/></svg>
+        </a>
+        <h1 style="margin:0;font-size:1.6rem;font-weight:700;letter-spacing:1px;">哈尔滨广傻学院心理AI助手</h1>
     </header>
-    <main class="chat-main" id="chat-main">
+    <main class="chat-main" id="chat-main" style="margin-top:0;">
         <!-- 聊天内容 -->
     </main>
     <div class="chat-footer-tip">AI助手仅供参考，遇到严重心理问题请及时寻求专业帮助 BY TLM Team</div>

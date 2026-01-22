@@ -28,22 +28,26 @@ public class DeepSeekService {
                 public Flux<String> streamChatWithHistory(List<DeepSeekMessageBO> history) {
                     String sysPrompt = DeepSeekPrompts.SYSTEM_PROMPT.replace("{studentName}", "the student");
                     List<Map<String, String>> messages = new ArrayList<>();
-                    messages.add(java.util.Map.of("role", "system", "content", sysPrompt));
+                    java.util.Map<String, String> sysMsg = new java.util.HashMap<>();
+                    sysMsg.put("role", "system");
+                    sysMsg.put("content", sysPrompt);
+                    messages.add(sysMsg);
                     if (history != null) {
                         for (DeepSeekMessageBO msg : history) {
                             String role = msg.getRole();
-                            // 只允许 user/assistant
                             if (!"user".equals(role) && !"assistant".equals(role)) {
                                 role = "user";
                             }
-                            messages.add(java.util.Map.of("role", role, "content", msg.getContent()));
+                            java.util.Map<String, String> m = new java.util.HashMap<>();
+                            m.put("role", role);
+                            m.put("content", msg.getContent());
+                            messages.add(m);
                         }
                     }
-                    Map<String, Object> requestBody = java.util.Map.of(
-                            "model", "deepseek-chat",
-                            "messages", messages,
-                            "stream", true
-                    );
+                    Map<String, Object> requestBody = new java.util.HashMap<>();
+                    requestBody.put("model", "deepseek-chat");
+                    requestBody.put("messages", messages);
+                    requestBody.put("stream", true);
                     log.info("DeepSeek请求体: {}", requestBody);
                     return deepSeekWebClient.post()
                             .contentType(MediaType.APPLICATION_JSON)
