@@ -30,10 +30,7 @@ public class UserInfoController {
 			return new ResponseCode<>(ResponseCode.NOT_YET_LOGIN.getCode(), "未登录");
 		}
 
-		StudentInfo studentInfo = studentInfoService.lambdaQuery()
-				.eq(StudentInfo::getUserId, user.getId())
-				.eq(StudentInfo::getStatus, 0)
-				.one();
+		StudentInfo studentInfo = studentInfoService.getByUserId(user.getId());
 		return ResponseCode.buildResponse(studentInfo);
 	}
 }
