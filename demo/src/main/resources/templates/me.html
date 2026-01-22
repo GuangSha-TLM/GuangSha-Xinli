@@ -8,8 +8,10 @@
     <style>
         .main-content {
             min-height: 70vh;
-            padding: 32px 16px 80px 16px;
+            padding: 48px 24px 100px 24px;
             text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
         }
         .user-avatar {
             width: 80px;
@@ -41,6 +43,59 @@
         }
         .logout-btn:hover {
             background: #c0392b;
+        }
+        .nav-bar {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100vw;
+            max-width: 700px;
+            background: #fff;
+            border-top: 1px solid #e0eafc;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 60px;
+            z-index: 100;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
+            margin: 0 auto;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            color: #4f8cff;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 10px 0;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            border-radius: 12px;
+            margin: 0 6px;
+            text-decoration: none;
+            display: block;
+        }
+        .nav-item.active {
+            color: #fff;
+            background: #4f8cff;
+        }
+        @media (max-width: 700px) {
+            .main-content, .nav-bar {
+                max-width: 100vw;
+            }
+        }
+        @media (max-width: 600px) {
+            .main-content {
+                padding: 24px 6px 80px 6px;
+            }
+            .nav-bar {
+                height: 52px;
+            }
+            .nav-item {
+                font-size: 1rem;
+                padding: 7px 0;
+            }
         }
     </style>
 </head>

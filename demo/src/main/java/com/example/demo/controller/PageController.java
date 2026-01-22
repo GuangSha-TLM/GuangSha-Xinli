@@ -14,4 +14,9 @@ public class PageController {
     public String authPage() {
         return "auth";
     }
+
+    @GetMapping("/me")
+    public String mePage() {
+        return "me";
+    }
 }
