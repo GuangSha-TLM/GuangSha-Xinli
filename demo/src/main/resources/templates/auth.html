@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>用户注册与登录</title>
+    <link rel="stylesheet" href="/chat.css">
+    <style>
+        .form-box {
+            margin: 32px auto 24px auto;
+            padding: 24px 18px 18px 18px;
+            border: 1px solid #e0eafc;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 360px;
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        .form-box h2 { margin-top: 0; color: #4f8cff; }
+        .form-box input {
+            width: 92%;
+            padding: 10px 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #d0d8e8;
+            font-size: 1rem;
+        }
+        .form-box button {
+            padding: 8px 20px;
+            background: #4f8cff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        .form-box button:hover {
+            background: #3570d4;
+        }
+        #msg { color: #e74c3c; text-align:center; margin-bottom: 10px; }
+        @media (max-width: 600px) {
+            .form-box { max-width: 98vw; padding: 16px 4vw; }
+            .form-box input { font-size: 0.95rem; }
+            .form-box button { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="form-box">
+    <div style="text-align:center;margin-bottom:18px;">
+        <button id="show-login" style="margin-right:8px;background:#4f8cff;color:#fff;" onclick="showLogin()">登录</button>
+        <button id="show-register" style="background:#e9f0ff;color:#4f8cff;" onclick="showRegister()">注册</button>
+    </div>
+    <div id="msg" style="min-height:24px;"></div>
+    <div id="login-form">
+        <h2>登录</h2>
+        <input type="text" id="login-username" placeholder="用户名" autocomplete="username"><br>
+        <input type="password" id="login-password" placeholder="密码" autocomplete="current-password"><br>
+        <button id="login-btn" onclick="login()">登录</button>
+    </div>
+    <div id="register-form" style="display:none;">
+        <h2>注册</h2>
+        <input type="text" id="reg-username" placeholder="用户名" autocomplete="username"><br>
+        <input type="password" id="reg-password" placeholder="密码" autocomplete="new-password"><br>
+        <button id="register-btn" onclick="register()">注册</button>
+    </div>
+</div>
+
+<script>
+function showLogin() {
+    document.getElementById('login-form').style.display = '';
+    document.getElementById('register-form').style.display = 'none';
+    document.getElementById('show-login').style.background = '#4f8cff';
+    document.getElementById('show-login').style.color = '#fff';
+    document.getElementById('show-register').style.background = '#e9f0ff';
+    document.getElementById('show-register').style.color = '#4f8cff';
+}
+function showRegister() {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('register-form').style.display = '';
+    document.getElementById('show-login').style.background = '#e9f0ff';
+    document.getElementById('show-login').style.color = '#4f8cff';
+    document.getElementById('show-register').style.background = '#4f8cff';
+    document.getElementById('show-register').style.color = '#fff';
+}
+// 默认显示登录
+showLogin();
+function register() {
+    var btn = document.getElementById('register-btn');
+    btn.disabled = true;
+    btn.innerText = '注册中...';
+    fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: document.getElementById('reg-username').value,
+            password: document.getElementById('reg-password').value
+        })
+    }).then(r => r.json()).then(d => {
+        btn.disabled = false;
+        btn.innerText = '注册';
+        var msg = document.getElementById('msg');
+        msg.style.color = d.code === 0 ? '#27ae60' : '#e74c3c';
+        msg.innerText = d.msg;
+        if (d.code === 0) {
+            showLogin();
+            msg.innerText = '注册成功，请登录';
+            setTimeout(function(){
+                msg.innerText = '';
+                document.getElementById('login-username').focus();
+            }, 1200);
+        }
+    }).catch(()=>{
+        btn.disabled = false;
+        btn.innerText = '注册';
+    });
+}
+function login() {
+    var btn = document.getElementById('login-btn');
+    btn.disabled = true;
+    btn.innerText = '登录中...';
+    fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: document.getElementById('login-username').value,
+            password: document.getElementById('login-password').value
+        })
+    }).then(r => r.json()).then(d => {
+        btn.disabled = false;
+        btn.innerText = '登录';
+        var msg = document.getElementById('msg');
+        msg.style.color = d.code === 0 ? '#27ae60' : '#e74c3c';
+        msg.innerText = d.msg;
+        if (d.code === 0) {
+            msg.innerText = '登录成功，正在跳转...';
+            setTimeout(function(){
+                window.location.href = '/index';
+            }, 1000);
+        }
+    }).catch(()=>{
+        btn.disabled = false;
+        btn.innerText = '登录';
+    });
+}
+function logout() {
+    fetch('/auth/logout').then(r => r.json()).then(d => {
+        document.getElementById('msg').innerText = d.msg;
+        document.getElementById('user-info').innerText = '';
+    });
+}
+function getMe() {
+    fetch('/auth/me').then(r => r.json()).then(d => {
+        document.getElementById('user-info').innerText = typeof d === 'string' ? d : JSON.stringify(d);
+    });
+}
+window.onload = getMe;
+</script>
+</body>
+</html>

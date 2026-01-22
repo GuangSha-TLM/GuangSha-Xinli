@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>首页</title>
+    <link rel="stylesheet" href="/chat.css">
+    <style>
+        .main-content {
+            min-height: 70vh;
+            padding: 32px 16px 80px 16px;
+            text-align: center;
+        }
+        .nav-bar {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100vw;
+            max-width: 480px;
+            background: #fff;
+            border-top: 1px solid #e0eafc;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 56px;
+            z-index: 100;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            color: #4f8cff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 8px 0;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav-item.active {
+            color: #fff;
+            background: #4f8cff;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="main-content">
+    <h1>欢迎来到首页</h1>
+    <p>这里是心理AI系统的首页。</p>
+</div>
+<div class="nav-bar">
+    <div class="nav-item active">首页</div>
+    <div class="nav-item">我的分析</div>
+    <div class="nav-item">我的</div>
+</div>
+</body>
+</html>
