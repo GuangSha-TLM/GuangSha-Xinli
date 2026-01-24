@@ -13,8 +13,8 @@ import lombok.EqualsAndHashCode;
 @TableName("student_info")
 public class StudentInfo extends BaseEntity {
 
-	@TableId(type = IdType.AUTO)
-	private Long id;
+//	@TableId(type = IdType.AUTO)
+//	private Long id;
 
 	@TableField("user_id")
 	private Long userId;

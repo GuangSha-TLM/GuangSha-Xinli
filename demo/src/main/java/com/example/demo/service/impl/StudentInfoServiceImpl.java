@@ -17,28 +17,22 @@ import javax.servlet.http.HttpSession;
 public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, StudentInfo> implements StudentInfoService {
 
 	@Override
-	public StudentInfo getByUserId(HttpSession session){
+	public StudentInfo getByUserId(HttpSession session) {
 		User user = (User) session.getAttribute("user");
-		if (user == null || user.getId() == null){
-			log.warn("未登录");
-			return null;
-		}
-
+//		if (user == null || user.getId() == null){
+//			log.warn("未登录");
+//			return null;
+//		}
+		log.info("session 中的 user: {}", user);
 		Long userId = user.getId();
-		log.info("student_info，userId = {}",userId);
+		log.info("student_info的userId = {}", userId);
 
-		return lambdaQuery()
+		StudentInfo one = lambdaQuery()
 				.eq(StudentInfo::getUserId, userId)
-				.eq(StudentInfo::getStatus, 0)// 去掉逻辑删除
 				.one();
 
-//		System.out.println("传入的 userId 值是：" + userId);
-//
-//		LambdaQueryWrapper<StudentInfo> wrapper = new LambdaQueryWrapper<>();
-//		wrapper.eq(StudentInfo::getUserId, userId);
+		log.info(String.valueOf(one));
+		return one;
 
-//		log.info("生成的 SQL: {}", wrapper.getSqlSegment());
-//		return getOne(wrapper);
 	}
-
 }
