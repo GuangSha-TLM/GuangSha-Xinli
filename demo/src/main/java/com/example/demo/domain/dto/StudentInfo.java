@@ -18,9 +18,13 @@ public class StudentInfo extends BaseEntity {
 
 	@TableField("user_id")
 	private Long userId;
-
+	@TableField("grade")
 	private String grade;
+	@TableField("major")
 	private String major;
-	private String collage;
+	@TableField("college")
+	private String college;
+
+	@TableField("classname")
 	private String className;
 }

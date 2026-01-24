@@ -15,6 +15,9 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+      logic-delete-field: status
+      logic-not-delete-value: 0
+      logic-delete-value: 1
 
 deepseek:
   key: sk-ae566333011c44a994c2ab009d81e255

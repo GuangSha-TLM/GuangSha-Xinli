@@ -25,12 +25,11 @@ public class UserInfoController {
 
 	@GetMapping("/info")
 	public ResponseCode<StudentInfo> getInfo(HttpSession session){
-		User user = userService.me(session);
-		if (user == null){
+		StudentInfo studentInfo = studentInfoService.getByUserId(session);
+		if (studentInfo == null){
 			return new ResponseCode<>(ResponseCode.NOT_YET_LOGIN.getCode(), "未登录");
 		}
 
-		StudentInfo studentInfo = studentInfoService.getByUserId(user.getId());
 		return ResponseCode.buildResponse(studentInfo);
 	}
 }

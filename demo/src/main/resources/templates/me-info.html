@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人信息</title>
+    <link rel="stylesheet" href="/static/chat.css">
+    <style>
+        body {
+            background: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            text-decoration: none;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+        }
+        .back-btn {
+            position: absolute;
+            font-size: 28px;
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .back-btn svg {
+            width: 1.5em;
+            height: 1.5em;
+            fill: white !important;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        .title {
+            flex: 1;
+            text-align: center;
+            font-size: 22px;
+        }
+        .container {
+            margin-top: 80px;
+            padding: 20px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .info-item {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        .label {
+            font-weight: bold;
+            color: #555;
+            display: inline-block;
+            width: 120px;
+            text-align: right;
+            margin-right: 15px;
+        }
+        .value {
+            color: #333;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .card { padding: 20px; }
+            .info-item { font-size: 16px; }
+            .label { width: 100px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <a href="/me" class="back-btn"><svg viewBox="0 0 20 20"><path d="M12.7 15.3a1 1 0 0 1-1.4 0l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 1 1 1.4 1.4L8.42 9H17a1 1 0 1 1 0 2H8.42l4.3 4.3a1 1 0 0 1 0 1.4z"/></svg></a>
+    <div class="title">我的个人信息</div>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>个人信息</h2>
+        <div id="info-content">
+            <p>加载中...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    fetch('/me/info',{
+        method: 'GET',
+        credentials: 'include'
+    })
+        .then(r => r.json())
+        .then(data => {
+            const content = document.getElementById('info-content');
+
+            // 先判断 code 是否成功
+            if (data.code !== 0) {
+                content.innerHTML = `<p style="color:red;">${data.msg || '请求失败，请登录'}</p>`;
+                return;
+            }
+
+            // 成功时取 data.data（StudentInfo 对象）
+            const info = data.data;
+
+            if (!info) {
+                content.innerHTML = '<p>暂无详细信息，请编辑完善</p>';
+                return;
+            }
+
+            // 显示学生信息
+            content.innerHTML = `
+      <div class="info-item">
+        <span class="label">学院：</span>
+        <span class="value">${info.college || '未设置'}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">专业：</span>
+        <span class="value">${info.major || '未设置'}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">班级：</span>
+        <span class="value">${info.className || '未设置'}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">年级：</span>
+        <span class="value">${info.grade || '未设置'}</span>
+      </div>
+    `;
+        })
+        .catch(err => {
+            document.getElementById('info-content').innerHTML =
+                '<p style="color:red;">加载失败，请稍后重试</p>';
+            console.error('Fetch error:', err);
+        });
+</script>
+</body>
+</html>
