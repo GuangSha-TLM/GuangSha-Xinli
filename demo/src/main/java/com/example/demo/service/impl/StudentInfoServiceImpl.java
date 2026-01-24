@@ -3,6 +3,7 @@ package com.example.demo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.demo.config.SessionHolder;
 import com.example.demo.domain.dto.StudentInfo;
 import com.example.demo.domain.dto.User;
 import com.example.demo.mapper.StudentInfoMapper;
@@ -12,13 +13,14 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 
+
 @Slf4j
 @Service
 public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, StudentInfo> implements StudentInfoService {
 
 	@Override
 	public StudentInfo getByUserId(HttpSession session) {
-		User user = (User) session.getAttribute("user");
+		User user = SessionHolder.getSession(session);
 //		if (user == null || user.getId() == null){
 //			log.warn("未登录");
 //			return null;
