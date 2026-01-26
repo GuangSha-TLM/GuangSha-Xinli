@@ -23,4 +23,9 @@ public class PageController {
     public String historyPage() {
         return "history";
     }
+
+	@GetMapping("/me/info-page")
+	public String meInfoPage(){
+		return "me-info";
+	}
 }
