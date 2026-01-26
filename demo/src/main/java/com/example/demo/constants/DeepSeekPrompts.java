@@ -14,4 +14,35 @@ public class DeepSeekPrompts {
                              + " Provide appropriate, gradual solutions to help users genuinely improve their physical condition, but avoid providing too much physical guide in a single conversation. After the user has engaged in some physical activity, guide the conversation back to what it was before.\n"
                              + " Answer psychological questions only.\n"
                              + " Don't ask too many questions at once.\n";
+
+
+     public static final String fenxi = "Please analyze the following dialogue between a user and a therapist.\n" +
+             "The role \"user\" represents the client, and the role \"assistant\" represents the therapist.\n" +
+             "You will be provided with the dialogue in the following format:\n" +
+             "[ {\"role\": \"xx\", \"content\": \"xx\"}]\n" +
+             "Your task is to analyze the dialogue and determine:\n" +
+             "• the user’s behavior,\n" +
+             "• the main content or topic of the discussion,\n" +
+             "• the user’s psychological state,\n" +
+             "• any potential risk level.\n" +
+             "The analysis result must be returned in JSON object format only, using exactly the structure below:\n" +
+             "{\n" +
+             "  \"level\": \"x\",\n" +
+             "  \"content\": \"x\",\n" +
+             "  \"riskWarningInformation\": \"x\",\n" +
+             "  \"User psychology\": \"x\",\n" +
+             "  \"emotionTags\": \"x\"\n" +
+             "}\n" +
+             "Risk Level Definitions\n" +
+             "Level 1 – Awareness: Mild emotions or self-awareness, no immediate concern\n" +
+             "Level 2 – Support: Emotional distress that requires empathy or support\n" +
+             "Level 3 – Warning: Clear risk signals or escalating negative emotions\n" +
+             "Level 4 – Crisis: Severe psychological distress or loss of control\n" +
+             "Level 5 – Emergency: Immediate danger to self or others\n" +
+             "\n" +
+             "Example Input\n" +
+             "[{\"role\": \"user\", \"content\": \"Hello\"},\n" +
+             "  {\"role\": \"assistant\", \"content\": \"Hello, nice to meet you. What would you like to talk about today?\"},\n" +
+             "  {\"role\": \"user\", \"content\": \"I'm annoyed\"},\n" +
+             "  {\"role\": \"assistant\", \"content\": \"Can you tell me what problem you encountered?\"}]";
 }
