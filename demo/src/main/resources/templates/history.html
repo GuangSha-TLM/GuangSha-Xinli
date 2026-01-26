@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>历史记录</title>
+    <link rel="stylesheet" href="/chat.css">
+    <style>
+        .main-content {
+            min-height: 70vh;
+            padding: 48px 24px 100px 24px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .history-list {
+            margin: 0 auto;
+            max-width: 600px;
+            background: #f7faff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(79,140,255,0.08);
+            padding: 18px 10px 10px 10px;
+            border: 1.5px solid #e0eafc;
+        }
+        .history-item {
+            background: #fff;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            padding: 14px 18px;
+            box-shadow: 0 1px 6px rgba(79,140,255,0.06);
+            text-align: left;
+            transition: box-shadow 0.2s, border 0.2s;
+        }
+        .history-item-title {
+            color: #4f8cff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+        .history-item-content {
+            color: #333;
+            font-size: 1rem;
+            word-break: break-all;
+        }
+        .empty-tip {
+            color: #aaa;
+            margin-top: 40px;
+        }
+        .nav-bar {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100vw;
+            max-width: 700px;
+            background: #fff;
+            border-top: 1px solid #e0eafc;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 60px;
+            z-index: 100;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
+            margin: 0 auto;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            color: #4f8cff;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 10px 0;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            border-radius: 12px;
+            margin: 0 6px;
+            text-decoration: none;
+            display: block;
+        }
+        .nav-item.active {
+            color: #fff;
+            background: #4f8cff;
+        }
+    </style>
+</head>
+<body>
+<div class="main-content">
+    <h1>历史记录</h1>
+    <div id="history-list" class="history-list">
+        <div class="empty-tip">加载中...</div>
+    </div>
+</div>
+<div class="nav-bar">
+    <a class="nav-item" href="/index">首页</a>
+    <a class="nav-item active" href="/history">历史记录</a>
+    <a class="nav-item" href="/me">我的</a>
+</div>
+<script>
+function formatDate(ts) {
+    if (!ts) return '';
+    var d = new Date(Number(ts));
+    var y = d.getFullYear();
+    var m = (d.getMonth()+1).toString().padStart(2,'0');
+    var day = d.getDate().toString().padStart(2,'0');
+    var h = d.getHours().toString().padStart(2,'0');
+    var min = d.getMinutes().toString().padStart(2,'0');
+    return `${y}-${m}-${day} ${h}:${min}`;
+}
+function renderHistory(list) {
+    const box = document.getElementById('history-list');
+    if (!list || list.length === 0) {
+        box.innerHTML = '<div class="empty-tip">暂无历史记录</div>';
+        return;
+    }
+    box.innerHTML = '';
+    list.forEach(item => {
+        let content = '';
+        try {
+            const arr = JSON.parse(item.messagesJson);
+            if (Array.isArray(arr) && arr.length > 0) {
+                // 只显示前4条消息
+                const showArr = arr.slice(0, 4);
+                content = showArr.map(msg => `<div><b>${msg.role === 'user' ? '我' : 'AI'}：</b>${msg.content}</div>`).join('');
+            }
+        } catch(e) {}
+        box.innerHTML += `<div class="history-item" style="cursor:pointer;" onclick="window.location.href='/chat?tid=${item.transactionId}'">
+            <div class="history-item-title">${formatDate(item.createAt)}</div>
+            <div class="history-item-content">${content || '无内容'}</div>
+        </div>`;
+    });
+}
+fetch('/chat/messages').then(r => r.json()).then(renderHistory).catch(()=>{
+    document.getElementById('history-list').innerHTML = '<div class="empty-tip">加载失败</div>';
+});
+</script>
+</body>
+</html>

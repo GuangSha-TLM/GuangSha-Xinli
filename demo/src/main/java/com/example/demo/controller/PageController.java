@@ -5,7 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class PageController {
-
+    @GetMapping({ "/index"})
+    public String indexPage() {
+        return "index";
+    }
 
     @GetMapping("/auth")
     public String authPage() {
@@ -15,5 +18,9 @@ public class PageController {
     @GetMapping("/me")
     public String mePage() {
         return "me";
+    }
+    @GetMapping("/history")
+    public String historyPage() {
+        return "history";
     }
 }
