@@ -6,34 +6,108 @@
     <title>个人信息</title>
     <link rel="stylesheet" href="/static/chat.css">
     <style>
-        body {
-            background: #f0f4f8;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            text-decoration: none;
+        :root {
+            --primary:     #7dc4ff;      /* 比原 #4f8cff 更柔和的藍 */
+            --primary-light: #c0e0ff;
+            --accent-pink: #ffd1dc;      /* 馬卡龍粉 */
+            --accent-green:#d4f4dd;      /* 薄荷奶油綠 */
+            --bg-soft:     #f9fbff;      /* 極淡藍白背景 */
+            --card-bg:     #ffffff;
+            --text-main:   #2d3748;
+            /*#4a5568*/
+            --text-light:  #718096;
+            --border-soft: #f8fbff;
         }
+
+        body {
+            background: var(--bg-soft);
+            color: var(--text-main);
+            font-family: "Noto Sans TC", "Segoe UI", sans-serif;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), #5a9cff);
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 4px 20px rgba(90, 156, 255, 0.15);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(160, 208, 255, 0.12);
+            border: 1px solid var(--border-soft);
+        }
+
+        .info-item {
+            margin: 24px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .label {
+            font-weight: 600;
+            color: var(--text-light);
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .value {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .info-btn {
+            background: var(--accent-pink);
+            color: white;
+            border: none;
+            border-radius: 999px;
+            padding: 12px 32px;
+            font-size: 16px;
+            box-shadow: 0 4px 20px rgba(255, 209, 220, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .info-btn:hover {
+            background: #ffacc7;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 140, 180, 0.3);
+        }
+
+        /*body {*/
+        /*    background: #f0f4f8;*/
+        /*    margin: 0;*/
+        /*    padding: 0;*/
+        /*    font-family: Arial, sans-serif;*/
+        /*    text-decoration: none;*/
+        /*}*/
         .header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            background: #007bff;
+            background: #4f8cff;
             color: white;
             padding: 15px;
             display: flex;
             align-items: center;
             z-index: 1000;
+            overflow: hidden;
+            border-bottom-left-radius: 32px;
+            border-bottom-right-radius: 32px;
         }
         .back-btn {
             position: absolute;
             font-size: 28px;
-            color: white;
+            color: #ffffff;
             text-decoration: none;
-            background: rgba(255,255,255,0.2);
+            /*background: rgba(255,255,255,0.2);*/
+            border-radius: 50%;
+            /*backdrop-filter: blur(4px);*/
             width: 40px;
             height: 40px;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -44,6 +118,7 @@
             width: 1.5em;
             height: 1.5em;
             fill: white !important;
+            display: block;
         }
         .back-btn:hover {
             background: rgba(255,255,255,0.4);
@@ -54,15 +129,17 @@
             font-size: 22px;
         }
         .container {
-            margin-top: 80px;
-            padding: 20px;
+            margin-top: -40px;
+            padding-top: 60px;
+            /*padding: 20px;*/
             max-width: 700px;
             margin-left: auto;
             margin-right: auto;
         }
         .card {
             background: white;
-            border-radius: 16px;
+            border-radius: 32px;
+            margin-top: 0;
             padding: 30px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.1);
             text-align: center;
@@ -79,8 +156,9 @@
             text-align: right;
             margin-right: 15px;
         }
-        .value {
-            color: #333;
+
+        .h2-color {
+            color: #5a9cff;
         }
         @media (max-width: 600px) {
             .container { padding: 15px; }
@@ -88,71 +166,90 @@
             .info-item { font-size: 16px; }
             .label { width: 100px; }
         }
+
+        .status { text-align: center; padding: 40px 0; color: #666; }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <header class="header">
-    <a href="/me" class="back-btn"><svg viewBox="0 0 20 20"><path d="M12.7 15.3a1 1 0 0 1-1.4 0l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 1 1 1.4 1.4L8.42 9H17a1 1 0 1 1 0 2H8.42l4.3 4.3a1 1 0 0 1 0 1.4z"/></svg></a>
+    <a href="/me" class="back-btn"><svg viewBox="0 0 23 20"><path d="M12.7 15.3a1 1 0 0 1-1.4 0l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 1 1 1.4 1.4L8.42 9H17a1 1 0 1 1 0 2H8.42l4.3 4.3a1 1 0 0 1 0 1.4z"/></svg></a>
     <div class="title">我的个人信息</div>
 </header>
 
 <div class="container">
     <div class="card">
-        <h2>个人信息</h2>
-        <div id="info-content">
-            <p>加载中...</p>
+        <h2 class="h2-color">个人信息</h2>
+
+        <div id="loading" class="status">加载中...</div>
+        <div id="error" class="status hidden">加载失败，请稍后重试</div>
+
+        <div id="info-content" class="hidden">
+            <div class="info-item">
+                <span class="label">年级：</span>
+                <span class="value" id="grade"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">专业：</span>
+                <span class="value" id="major"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">学院：</span>
+                <span class="value" id="college"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">班级：</span>
+                <span class="value" id="className"></span>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    fetch('/me/info',{
-        method: 'GET',
-        credentials: 'include'
-    })
-        .then(r => r.json())
+    fetch('/me/info')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP error! status: ' + response.status);
+            }
+            return response.json();
+        })
         .then(data => {
-            const content = document.getElementById('info-content');
+            console.log('收到数据:', data);
+            document.getElementById('loading').classList.add('hidden');
 
-            // 先判断 code 是否成功
+            // 检查响应码
             if (data.code !== 0) {
-                content.innerHTML = `<p style="color:red;">${data.msg || '请求失败，请登录'}</p>`;
+                console.error('API 返回错误:', data.msg);
+                document.getElementById('error').classList.remove('hidden');
                 return;
             }
 
             // 成功时取 data.data（StudentInfo 对象）
             const info = data.data;
+            console.log('学生信息:', info);
 
-            if (!info) {
-                content.innerHTML = '<p>暂无详细信息，请编辑完善</p>';
+            if (!info || Object.keys(info).length === 0) {
+                document.getElementById('info-content').innerHTML =
+                '<p style="text-align: center; color: #999; padding: 40px 0;">暂无详细信息，请编辑完善</p>';
+                document.getElementById('info-content').classList.remove('hidden');
                 return;
             }
 
             // 显示学生信息
-            content.innerHTML = `
-      <div class="info-item">
-        <span class="label">学院：</span>
-        <span class="value">${info.college || '未设置'}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">专业：</span>
-        <span class="value">${info.major || '未设置'}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">班级：</span>
-        <span class="value">${info.className || '未设置'}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">年级：</span>
-        <span class="value">${info.grade || '未设置'}</span>
-      </div>
-    `;
+            document.getElementById('grade').textContent = info.grade || '未设置';
+            document.getElementById('major').textContent = info.major || '未设置';
+            document.getElementById('college').textContent = info.college || '未设置';
+            // 注意：Java 中字段名是 className（驼峰），JSON 序列化后也是 className
+            document.getElementById('className').textContent = info.className || '未设置';
+
+            document.getElementById('info-content').classList.remove('hidden');
         })
         .catch(err => {
-            document.getElementById('info-content').innerHTML =
-                '<p style="color:red;">加载失败，请稍后重试</p>';
-            console.error('Fetch error:', err);
+            console.error('获取信息失败:', err);
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
         });
 </script>
 </body>
