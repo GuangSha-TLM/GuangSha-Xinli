@@ -9,11 +9,30 @@ const chatMain = document.getElementById('chat-main');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 
-function getSidFromUrl() {
+
+function getTidFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    return params.get('sid');
+    return params.get('tid');
 }
-const transactionId = getSidFromUrl();
+const transactionId = getTidFromUrl();
+
+// 页面加载时，如果有tid参数，则拉取历史消息并渲染
+if (transactionId) {
+    fetch(`/chat/message?tid=${transactionId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.messagesJson) {
+                try {
+                    const arr = JSON.parse(data.messagesJson);
+                    if (Array.isArray(arr)) {
+                        arr.forEach(msg => {
+                            appendMessage(msg.role === 'user' ? 'user' : 'ai', msg.content);
+                        });
+                    }
+                } catch (e) {}
+            }
+        });
+}
 
 function appendMessage(role, text, streaming = false) {
     const msgDiv = document.createElement('div');
