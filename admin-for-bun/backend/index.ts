@@ -1,13 +1,10 @@
-const server = Bun.serve({
-  port: 3000,
-  fetch(req) {
-    return new Response(
-      JSON.stringify({
-        message: "Hello from Bun backend 🚀"
-      }),
-      { headers: { "Content-Type": "application/json" } }
-    )
-  }
-})
+import { Elysia } from "elysia";
+import { userController } from "./src/controllers/userController";
 
-console.log(`Server running on http://localhost:${server.port}`)
+const app = new Elysia();
+
+app.use(userController);
+
+app.listen(3000);
+
+console.log("Server started at http://localhost:3000");
