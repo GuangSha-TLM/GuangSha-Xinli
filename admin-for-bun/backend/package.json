@@ -10,10 +10,13 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@elysiajs/jwt": "^1.4.0",
     "better-sqlite3": "^12.6.2",
+    "bun-jwt": "^1.0.1",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.1",
     "elysia": "^1.4.22",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.16.2"
   }
 }

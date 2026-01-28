@@ -1,3 +1,9 @@
+process.on("uncaughtException", (err) => {
+	console.error("Uncaught Exception:", err);
+});
+process.on("unhandledRejection", (err) => {
+	console.error("Unhandled Rejection:", err);
+});
 import { Elysia } from "elysia";
 import { userController } from "./src/controllers/userController";
 
