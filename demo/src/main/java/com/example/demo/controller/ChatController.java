@@ -1,6 +1,7 @@
 
 package com.example.demo.controller;
 
+import com.example.demo.config.SessionHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -58,4 +59,11 @@ public class ChatController {
         if (list == null) return null;
         return list.stream().filter(m -> tid != null && tid.equals(m.getTransactionId())).findFirst().orElse(null);
     }
+
+	@GetMapping("/history/view")
+	public User findUser(HttpSession session){
+		User historyMsg = SessionHolder.getSession(session);
+
+		return historyMsg;
+	}
 }

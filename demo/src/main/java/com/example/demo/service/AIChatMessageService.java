@@ -10,4 +10,10 @@ public interface AIChatMessageService extends IService<AiChatMessage> {
 	 * 根据 createBy 查询所有 AiChatMessage
 	 */
 	List<AiChatMessage> listByCreateBy(String createBy);
+
+	/**
+	 * start 时间范围的起始
+	 * end 时间范围的结束
+	 */
+	List<AiChatMessage> findByDateRange(Long createBy, Long start, Long end);
 }

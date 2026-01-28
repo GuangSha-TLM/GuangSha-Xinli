@@ -82,11 +82,65 @@
             color: #fff;
             background: #4f8cff;
         }
+
+        .header-bar {
+            display: flex;
+            align-items: center; /* 水平居中 */
+            justify-content: space-between; /* 文字和按钮分两头 */
+            margin: 24px auto; /* 上下留出距离，不再割裂 */
+            padding: 6px 6px 6px 20px; /* 左边多留点空白给文字 */
+            background: #f1f5f9; /* 使用浅灰色背景，不再是生硬的纯白*/
+            border-radius: 999px; /* 极致圆角，胶囊形状 */
+            max-width: 400px; /* 宽度调窄，不要太宽 */
+            cursor: pointer; /* 鼠标移上去变手指 */
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .title {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .search-btn {
+            background: #5a9cff;             /* 马卡龙蓝 */
+            color: white;
+            border: none;
+            border-radius: 999px;
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(106, 174, 255, 0.25);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .search-btn:hover {
+            background: #5a9cff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(106, 174, 255, 0.35);
+        }
+        /* 手机端优化：按钮不要太大 */
+        @media (max-width: 480px) {
+            .header-bar {
+                padding: 12px 16px;
+            }
+            .title {
+                font-size: 18px;
+            }
+            .search-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="main-content">
-    <h1>历史记录</h1>
+    <div class="header-bar">
+    <h1 class="title">历史记录</h1>
+        <button class="search-btn" onclick="window.location.href = '/historyChat-search'">搜索</button>
+    </div>
     <div id="history-list" class="history-list">
         <div class="empty-tip">加载中...</div>
     </div>

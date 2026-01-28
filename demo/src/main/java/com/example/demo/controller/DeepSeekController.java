@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import com.example.demo.config.SessionHolder;
+import com.example.demo.domain.dto.User;
+import com.example.demo.domain.entity.ResponseCode;
 import com.example.demo.service.DeepSeekService;
 import com.example.demo.service.AIChatMessageService;
 import com.example.demo.domain.dto.AiChatMessage;
@@ -8,6 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.domain.bo.DeepSeekPromptBO;
 import reactor.core.publisher.Flux;
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/deepseek")
@@ -62,4 +69,13 @@ public class DeepSeekController {
         }
         aiChatMessageService.saveOrUpdate(chatMessage);
     }
+
+	@PostMapping("/history/data")
+	public ResponseCode<List<AiChatMessage>> findMsgByDate(@RequestBody Map<String, Long> dateRange, HttpSession session){
+		User loginUser = SessionHolder.getSession(session);
+		// getId()取出Session里装的用户id
+		Long user = loginUser.getId();
+
+		return ResponseCode.buildResponse(aiChatMessageService.findByDateRange(user, dateRange.get("start"), dateRange.get("end")));
+	}
 }

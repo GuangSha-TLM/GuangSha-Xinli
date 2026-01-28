@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天历史记录</title>
+    <style>
+        /* 基础背景与字体升级 */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #DCE7FA;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #333;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            padding: 0 20px;
+            background: #4F8CFF;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: white;
+        }
+
+        .nav-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .search-section {
+            margin: 20px;
+            background: #FFFFFF;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .date-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .input-box {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .input-box label {
+            width: 60px;
+            font-size: 15px;
+            color: #666;
+        }
+
+        .input-box input {
+            flex: 1;
+            border: 1px solid #E2E8F0;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            background: #F8FAFF;
+        }
+
+        .date-sep { display: none; }
+
+        .primary-search-btn {
+            width: 100%;
+            height: 54px;
+            background: #4F8CFF;
+            color: #fff;
+            border: none;
+            border-radius: 27px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .history-item {
+            background: #fff;
+            border-radius: 16px;
+            margin: 15px 20px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(79,140,255,0.08);
+            text-align: left;
+        }
+
+        .history-item-title {
+            color: #4f8cff;
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #f0f4ff;
+            padding-bottom: 8px;
+        }
+
+        .history-item-content {
+            color: #333;
+            font-size: 1.3rem;
+            line-height: 1.7;
+            word-break: break-all;
+        }
+
+        .history-item-content strong {
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        /* 状态提示 */
+        .status-tip {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 16px;
+            margin-top: 80px;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+<div class="mobile-wrapper">
+    <header class="nav-header">
+        <div class="nav-left" onclick="window.history.back()">
+            <svg viewBox="0 0 24 24" width="28" height="28">
+                <path fill="currentColor" d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+            </svg>
+        </div>
+        <h2 class="nav-title">历史记录</h2>
+        <div class="nav-right"></div> </header>
+
+    <section class="search-section">
+        <div class="date-group">
+            <div class="input-box">
+                <label>开始</label>
+                <input type="date" id="start-date" />
+            </div>
+            <div class="input-box">
+                <label>结束</label>
+                <input type="date" id="end-date" />
+            </div>
+        </div>
+        <button class="primary-search-btn" onclick="searchHistory()">查询历史对话</button>
+    </section>
+
+    <main id="history-list" class="content-list"></main>
+    <div id="loading" class="status-tip" style="display: none;">加载中...</div>
+    <div id="no-data" class="status-tip">请选择时间并点击搜索以查看记录</div>
+</div>
+
+<script>
+    function loadHistory(start = null, end = null) {
+        const loadingEl = document.getElementById('loading');
+        const noDataEl = document.getElementById('no-data');
+        const listEl = document.getElementById('history-list');
+
+        loadingEl.style.display = 'block';
+        noDataEl.classList.add('hidden');
+        listEl.innerHTML = '';
+
+        fetch('/deepseek/history/data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ "start": start, "end": end })
+        })
+            .then(response => response.json())
+            .then(data => {
+                loadingEl.style.display = 'none';
+                const records = data.data || [];
+
+                if (records.length === 0) {
+                    noDataEl.innerText = "该时间段内没有记录";
+                    noDataEl.classList.remove('hidden');
+                    return;
+                }
+
+                noDataEl.classList.add('hidden');
+
+                records.forEach(record => {
+                    const rawJson = record.messagesJson || record.messageJson;
+                    if (!rawJson) return;
+
+                    let msgArray;
+                    try {
+                        msgArray = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
+                    } catch (e) { return; }
+
+                    let chatHtml = '';
+                    if (Array.isArray(msgArray)) {
+                        msgArray.forEach(msg => {
+                            const roleName = msg.role === 'user' ? '我' : 'AI';
+                            chatHtml += `<div class="history-item-content"><strong>${roleName}：</strong>${msg.content}</div>`;
+                        });
+                    }
+
+                    const timeStr = new Date(record.createAt).toLocaleString('zh-CN', {
+                        year: 'numeric', month: '2-digit', day: '2-digit',
+                        hour: '2-digit', minute: '2-digit', hour12: false
+                    });
+
+                    const card = document.createElement('div');
+                    card.className = 'history-item';
+
+                    card.innerHTML = `
+                <div class="history-item-title">${timeStr}</div>
+                <div class="history-item-content">${chatHtml}</div>
+                `;
+
+                    document.getElementById('history-list').appendChild(card);
+                });
+            })
+            .catch(err => {
+                console.error("请求失败:", err);
+                loadingEl.style.display = 'none';
+            });
+    }
+
+    function searchHistory() {
+        const startInput = document.getElementById('start-date').value;
+        const endInput = document.getElementById('end-date').value;
+
+        if (!startInput || !endInput) {
+            alert('请选择完整的时间区间');
+            return;
+        }
+
+        const startTs = new Date(startInput).getTime();
+        const endDate = new Date(endInput);
+        endDate.setHours(23, 59, 59, 999);
+
+        loadHistory(startTs, endDate.getTime());
+    }
+</script>
+</body>
+</html>

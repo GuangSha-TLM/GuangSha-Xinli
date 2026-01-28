@@ -28,4 +28,9 @@ public class PageController {
 	public String meInfoPage(){
 		return "me-info";
 	}
+
+	@GetMapping("/historyChat-search")
+	public String historySearch(){
+		return "history-search";
+	}
 }
