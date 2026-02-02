@@ -21,3 +21,5 @@ mybatis-plus:
 deepseek:
   key: sk-ae566333011c44a994c2ab009d81e255
 
+video:
+  vide: 123
