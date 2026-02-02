@@ -1,7 +1,9 @@
 package com.example.demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.demo.config.SessionHolder;
 import com.example.demo.domain.dto.StudentInfo;
@@ -36,5 +38,11 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
 		log.info(String.valueOf(one));
 		return one;
 
+	}
+
+	@Override
+	public IPage<StudentInfo> getAllStudentInfoPage(Page<StudentInfo> page) {
+		// 使用 MyBatis Plus 的 page 方法进行分页查询
+		return this.page(page, Wrappers.lambdaQuery());
 	}
 }
