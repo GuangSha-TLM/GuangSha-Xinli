@@ -26,11 +26,11 @@ public class AIChatMessageServiceImpl extends ServiceImpl<AIChatMessageMapper, A
 	}
 
 	@Override
-	public List<AiChatMessage> findByDateRange(Long createBy, Long start, Long end){
+	public List<AiChatMessage> findByDateRange(Long createBy){
 
 		List<AiChatMessage> historyMsg = lambdaQuery()
 				.eq(AiChatMessage::getCreateBy, createBy)
-				.between(AiChatMessage::getCreateAt, start, end)
+//				.between(AiChatMessage::getCreateAt, start, end)
 				.list();
 //		log.info("查询用户-userId:{}, start:{}, end:{}", createBy, start, end);
 //		log.info("查询到的历史消息为：{}" , historyMsg);

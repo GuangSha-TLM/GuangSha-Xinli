@@ -1,21 +1,37 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>聊天历史记录</title>
     <style>
-        /* 基础背景与字体升级 */
+        :root {
+            --bg: #e7eefc;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --card-radius: clamp(16px, 4vw, 22px);
+            --shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+            --font-base: clamp(14px, 1.8vw, 18px);
+            --font-title: clamp(20px, 3.2vw, 28px);
+            --font-subtitle: clamp(14px, 2.4vw, 18px);
+            --font-chat: clamp(14px, 2.6vw, 18px);
+        }
+
+        * { box-sizing: border-box; }
+
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            background-color: #DCE7FA;
+            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #333;
-            -webkit-font-smoothing: antialiased;
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .nav-header {
@@ -24,224 +40,415 @@
             justify-content: space-between;
             height: 60px;
             padding: 0 20px;
-            background: #4F8CFF;
+            background: #4f8cff;
             position: sticky;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            color: white;
+            z-index: 10;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.2);
+            color: #fff;
         }
 
         .nav-title {
-            font-size: 1.2rem;
+            font-size: var(--font-title);
             font-weight: 700;
+            margin: 0;
         }
 
-        .search-section {
-            margin: 20px;
-            background: #FFFFFF;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        .nav-left,
+        .nav-right {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .date-group {
+        .main {
+            width: min(1080px, 100%);
+            margin: 0 auto;
+            padding: clamp(16px, 3vw, 28px);
+            flex: 1;
+        }
+
+        .view {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: clamp(16px, 3vw, 24px);
         }
 
-        .input-box {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-        }
-
-        .input-box label {
-            width: 60px;
-            font-size: 15px;
-            color: #666;
-        }
-
-        .input-box input {
-            flex: 1;
-            border: 1px solid #E2E8F0;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 16px;
-            outline: none;
-            background: #F8FAFF;
-        }
-
-        .date-sep { display: none; }
-
-        .primary-search-btn {
-            width: 100%;
-            height: 54px;
-            background: #4F8CFF;
-            color: #fff;
-            border: none;
-            border-radius: 27px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .history-item {
-            background: #fff;
-            border-radius: 16px;
-            margin: 15px 20px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(79,140,255,0.08);
-            text-align: left;
-        }
-
-        .history-item-title {
-            color: #4f8cff;
+        .section-title {
+            font-size: var(--font-title);
             font-weight: 700;
-            font-size: 1.15rem;
-            margin-bottom: 12px;
-            border-bottom: 1px solid #f0f4ff;
-            padding-bottom: 8px;
         }
 
-        .history-item-content {
-            color: #333;
-            font-size: 1.3rem;
-            line-height: 1.7;
-            word-break: break-all;
+        .card-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(16px, 3vw, 22px);
         }
 
-        .history-item-content strong {
-            color: #1a1a1a;
-            font-weight: 600;
-            margin-right: 6px;
+        .date-card {
+            position: relative;
+            background: var(--card-grad, linear-gradient(120deg, #5871f5, #9cc1ff));
+            border-radius: var(--card-radius);
+            padding: clamp(18px, 3.6vw, 28px);
+            color: #f8fafc;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
 
-        /* 状态提示 */
+        .date-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(15, 23, 42, 0.2);
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-weekday {
+            font-size: clamp(20px, 3.6vw, 26px);
+            font-weight: 700;
+        }
+
+        .card-date {
+            font-size: var(--font-subtitle);
+            opacity: 0.9;
+        }
+
+        .card-icon {
+            position: absolute;
+            right: clamp(16px, 3vw, 24px);
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.35;
+        }
+
+        .card-icon svg {
+            width: clamp(46px, 7vw, 72px);
+            height: clamp(46px, 7vw, 72px);
+            fill: currentColor;
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .detail-title {
+            font-size: var(--font-title);
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+        }
+
+        .chat-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .chat-time {
+            align-self: center;
+            font-size: clamp(12px, 2vw, 14px);
+            color: var(--muted);
+            background: #f1f5f9;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .chat-item {
+            display: flex;
+        }
+
+        .chat-item.is-user {
+            justify-content: flex-end;
+        }
+
+        .chat-item.is-ai {
+            justify-content: flex-start;
+        }
+
+        .chat-bubble {
+            max-width: min(75%, 680px);
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: var(--font-chat);
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .chat-item.is-user .chat-bubble {
+            background: #3b82f6;
+            color: #fff;
+            border-bottom-right-radius: 6px;
+        }
+
+        .chat-item.is-ai .chat-bubble {
+            background: #ffffff;
+            color: var(--text);
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 6px;
+        }
+
         .status-tip {
             text-align: center;
-            color: #94A3B8;
-            font-size: 16px;
-            margin-top: 80px;
+            color: var(--muted);
+            font-size: var(--font-subtitle);
+            margin-top: 40px;
         }
 
         .hidden { display: none !important; }
+
+        @media (min-width: 768px) {
+            .card-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1100px) {
+            .card-list {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
     </style>
 </head>
 <body>
-<div class="mobile-wrapper">
+<div class="page">
     <header class="nav-header">
         <div class="nav-left" onclick="window.history.back()">
             <svg viewBox="0 0 24 24" width="28" height="28">
                 <path fill="currentColor" d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
             </svg>
         </div>
-        <h2 class="nav-title">历史记录</h2>
-        <div class="nav-right"></div> </header>
+        <h2 class="nav-title" id="nav-title">历史记录</h2>
+        <div class="nav-right"></div>
+    </header>
 
-    <section class="search-section">
-        <div class="date-group">
-            <div class="input-box">
-                <label>开始</label>
-                <input type="date" id="start-date" />
-            </div>
-            <div class="input-box">
-                <label>结束</label>
-                <input type="date" id="end-date" />
-            </div>
-        </div>
-        <button class="primary-search-btn" onclick="searchHistory()">查询历史对话</button>
-    </section>
+    <main class="main">
+        <section id="view-list" class="view">
+            <div class="section-title">历史记录</div>
+            <div id="card-list" class="card-list"></div>
+            <div id="list-loading" class="status-tip hidden">加载中...</div>
+            <div id="list-empty" class="status-tip hidden">暂无匹配记录</div>
+        </section>
 
-    <main id="history-list" class="content-list"></main>
-    <div id="loading" class="status-tip" style="display: none;">加载中...</div>
-    <div id="no-data" class="status-tip">请选择时间并点击搜索以查看记录</div>
+        <section id="view-detail" class="view hidden">
+            <div id="detail-title" class="detail-title">详情</div>
+            <div style="width: 72px;"></div>
+
+            <div id="chat-list" class="chat-list"></div>
+            <div id="detail-empty" class="status-tip hidden">暂无记录</div>
+        </section>
+    </main>
 </div>
 
 <script>
-    function loadHistory(start = null, end = null) {
-        const loadingEl = document.getElementById('loading');
-        const noDataEl = document.getElementById('no-data');
-        const listEl = document.getElementById('history-list');
+    const listView = document.getElementById('view-list');
+    const detailView = document.getElementById('view-detail');
+    const cardListEl = document.getElementById('card-list');
+    const chatListEl = document.getElementById('chat-list');
+    const navTitleEl = document.getElementById('nav-title');
+    const detailTitleEl = document.getElementById('detail-title');
+    const listLoadingEl = document.getElementById('list-loading');
+    const listEmptyEl = document.getElementById('list-empty');
+    const detailEmptyEl = document.getElementById('detail-empty');
 
-        loadingEl.style.display = 'block';
-        noDataEl.classList.add('hidden');
-        listEl.innerHTML = '';
+    const weekdayMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const gradientMap = {
+        '星期一': 'linear-gradient(120deg, #30304a, #8a8ed6)',
+        '星期二': 'linear-gradient(120deg, #2e335a, #7fd3ff)',
+        '星期三': 'linear-gradient(120deg, #3f2b54, #f5a36c)',
+        '星期四': 'linear-gradient(120deg, #245a78, #a6d3ff)',
+        '星期五': 'linear-gradient(120deg, #2f5a78, #8eb6d9)',
+        '星期六': 'linear-gradient(120deg, #2b2f4c, #f285c6)',
+        '星期日': 'linear-gradient(120deg, #2e2e38, #9fa7ff)'
+    };
+
+    let allRecords = [];
+    let groupedByDate = new Map();
+
+    function pad(num) {
+        return String(num).padStart(2, '0');
+    }
+
+    function getDateKey(dateObj) {
+        const year = dateObj.getFullYear();
+        const month = pad(dateObj.getMonth() + 1);
+        const day = pad(dateObj.getDate());
+        return `${year}-${month}-${day}`;
+    }
+
+    function formatDateTitle(dateKey) {
+        const dateObj = new Date(`${dateKey}T00:00:00`);
+        const weekday = weekdayMap[dateObj.getDay()];
+        return `${weekday} ${dateKey}`;
+    }
+
+    function getDateParam() {
+        return new URLSearchParams(window.location.search).get('date');
+    }
+
+    function toggleView(view) {
+        if (view === 'detail') {
+            listView.classList.add('hidden');
+            detailView.classList.remove('hidden');
+            navTitleEl.textContent = '历史详情';
+        } else {
+            detailView.classList.add('hidden');
+            listView.classList.remove('hidden');
+            navTitleEl.textContent = '历史记录';
+        }
+    }
+
+    function parseMessages(record) {
+        const rawJson = record.messagesJson || record.messageJson;
+        if (!rawJson) return [];
+        try {
+            const parsed = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function renderList() {
+        cardListEl.innerHTML = '';
+        listEmptyEl.classList.add('hidden');
+
+        if (groupedByDate.size === 0) {
+            listEmptyEl.classList.remove('hidden');
+            return;
+        }
+
+        const sortedDates = Array.from(groupedByDate.keys()).sort((a, b) => b.localeCompare(a));
+        sortedDates.forEach(dateKey => {
+            const dateObj = new Date(`${dateKey}T00:00:00`);
+            const weekday = weekdayMap[dateObj.getDay()];
+            const card = document.createElement('div');
+            card.className = 'date-card';
+            card.style.setProperty('--card-grad', gradientMap[weekday] || gradientMap['星期一']);
+            card.dataset.date = dateKey;
+            card.innerHTML = `
+                <div class="card-content">
+                    <div class="card-weekday">${weekday}</div>
+                    <div class="card-date">${dateKey}</div>
+                </div>
+                <div class="card-icon" aria-hidden="true">
+                    <svg viewBox="0 0 48 48">
+                        <path d="M10 36h20l8 6V12a6 6 0 0 0-6-6H10a6 6 0 0 0-6 6v18a6 6 0 0 0 6 6z"/>
+                    </svg>
+                </div>
+            `;
+            card.addEventListener('click', () => {
+                navigateToDate(dateKey, true);
+            });
+            cardListEl.appendChild(card);
+        });
+    }
+
+    function renderDetail(dateKey) {
+        chatListEl.innerHTML = '';
+        detailEmptyEl.classList.add('hidden');
+        detailTitleEl.textContent = formatDateTitle(dateKey);
+
+        const records = groupedByDate.get(dateKey) || [];
+        if (records.length === 0) {
+            detailEmptyEl.classList.remove('hidden');
+            return;
+        }
+
+        records.forEach(record => {
+            const timeLabel = new Date(record.createAt).toLocaleTimeString('zh-CN', {
+                hour: '2-digit', minute: '2-digit', hour12: false
+            });
+            const timeEl = document.createElement('div');
+            timeEl.className = 'chat-time';
+            timeEl.textContent = timeLabel;
+            chatListEl.appendChild(timeEl);
+
+            const messages = parseMessages(record);
+            messages.forEach(msg => {
+                const item = document.createElement('div');
+                const isUser = msg.role === 'user';
+                item.className = `chat-item ${isUser ? 'is-user' : 'is-ai'}`;
+                const bubble = document.createElement('div');
+                bubble.className = 'chat-bubble';
+                bubble.textContent = msg.content || '';
+                item.appendChild(bubble);
+                chatListEl.appendChild(item);
+            });
+        });
+    }
+
+    function navigateToDate(dateKey, push) {
+        if (push) {
+            history.pushState({ date: dateKey }, '', `?date=${dateKey}`);
+        }
+        toggleView('detail');
+        renderDetail(dateKey);
+    }
+
+    function handleRoute() {
+        const dateParam = getDateParam();
+        if (dateParam) {
+            navigateToDate(dateParam, false);
+        } else {
+            toggleView('list');
+            renderList();
+        }
+    }
+
+    function loadHistory() {
+        listLoadingEl.classList.remove('hidden');
+        listEmptyEl.classList.add('hidden');
 
         fetch('/deepseek/history/data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ "start": start, "end": end })
+            body: JSON.stringify({ start: null, end: null })
         })
             .then(response => response.json())
             .then(data => {
-                loadingEl.style.display = 'none';
-                const records = data.data || [];
+                listLoadingEl.classList.add('hidden');
+                allRecords = data.data || [];
+                groupedByDate = new Map();
 
-                if (records.length === 0) {
-                    noDataEl.innerText = "该时间段内没有记录";
-                    noDataEl.classList.remove('hidden');
-                    return;
-                }
-
-                noDataEl.classList.add('hidden');
-
-                records.forEach(record => {
-                    const rawJson = record.messagesJson || record.messageJson;
-                    if (!rawJson) return;
-
-                    let msgArray;
-                    try {
-                        msgArray = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
-                    } catch (e) { return; }
-
-                    let chatHtml = '';
-                    if (Array.isArray(msgArray)) {
-                        msgArray.forEach(msg => {
-                            const roleName = msg.role === 'user' ? '我' : 'AI';
-                            chatHtml += `<div class="history-item-content"><strong>${roleName}：</strong>${msg.content}</div>`;
-                        });
+                allRecords.forEach(record => {
+                    if (!record.createAt) return;
+                    const dateObj = new Date(record.createAt);
+                    const dateKey = getDateKey(dateObj);
+                    if (!groupedByDate.has(dateKey)) {
+                        groupedByDate.set(dateKey, []);
                     }
-
-                    const timeStr = new Date(record.createAt).toLocaleString('zh-CN', {
-                        year: 'numeric', month: '2-digit', day: '2-digit',
-                        hour: '2-digit', minute: '2-digit', hour12: false
-                    });
-
-                    const card = document.createElement('div');
-                    card.className = 'history-item';
-
-                    card.innerHTML = `
-                <div class="history-item-title">${timeStr}</div>
-                <div class="history-item-content">${chatHtml}</div>
-                `;
-
-                    document.getElementById('history-list').appendChild(card);
+                    groupedByDate.get(dateKey).push(record);
                 });
+
+                groupedByDate.forEach(records => {
+                    records.sort((a, b) => new Date(a.createAt) - new Date(b.createAt));
+                });
+
+                handleRoute();
             })
             .catch(err => {
-                console.error("请求失败:", err);
-                loadingEl.style.display = 'none';
+                console.error('请求失败:', err);
+                listLoadingEl.classList.add('hidden');
+                listEmptyEl.classList.remove('hidden');
+                listEmptyEl.textContent = '暂无匹配记录';
             });
     }
 
-    function searchHistory() {
-        const startInput = document.getElementById('start-date').value;
-        const endInput = document.getElementById('end-date').value;
+    window.addEventListener('popstate', () => {
+        handleRoute();
+    });
 
-        if (!startInput || !endInput) {
-            alert('请选择完整的时间区间');
-            return;
-        }
-
-        const startTs = new Date(startInput).getTime();
-        const endDate = new Date(endInput);
-        endDate.setHours(23, 59, 59, 999);
-
-        loadHistory(startTs, endDate.getTime());
-    }
+    loadHistory();
 </script>
 </body>
 </html>

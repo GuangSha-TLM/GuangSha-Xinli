@@ -71,11 +71,10 @@ public class DeepSeekController {
     }
 
 	@PostMapping("/history/data")
-	public ResponseCode<List<AiChatMessage>> findMsgByDate(@RequestBody Map<String, Long> dateRange, HttpSession session){
+	public ResponseCode<List<AiChatMessage>> findMsgByDate(HttpSession session){
 		User loginUser = SessionHolder.getSession(session);
 		// getId()取出Session里装的用户id
 		Long user = loginUser.getId();
-
-		return ResponseCode.buildResponse(aiChatMessageService.findByDateRange(user, dateRange.get("start"), dateRange.get("end")));
+		return ResponseCode.buildResponse(aiChatMessageService.findByDateRange(user));
 	}
 }

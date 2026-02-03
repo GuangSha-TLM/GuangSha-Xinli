@@ -15,5 +15,5 @@ public interface AIChatMessageService extends IService<AiChatMessage> {
 	 * start 时间范围的起始
 	 * end 时间范围的结束
 	 */
-	List<AiChatMessage> findByDateRange(Long createBy, Long start, Long end);
+	List<AiChatMessage> findByDateRange(Long createBy);
 }
